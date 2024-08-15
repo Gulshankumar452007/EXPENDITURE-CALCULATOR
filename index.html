@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expenditure Calculator</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+        h1 { text-align: center; color: #333; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        input[type="number"] { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; }
+        button { width: 100%; padding: 10px; background-color: #007BFF; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        .result { margin-top: 20px; font-size: 18px; color: #333; }
+        .total { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Expenditure Calculator</h1>
+        <div id="items-container">
+            <div class="item">
+                <input type="number" placeholder="Enter amount" class="amount">
+            </div>
+        </div>
+        <button id="add-item">Add Item</button>
+        <button id="calculate-total">Calculate Total</button>
+        <div class="result">
+            <p>Total Expenditure: <span class="total">0</span></p>
+        </div>
+    </div>
+    <script>
+        const addItemBtn = document.getElementById('add-item');
+        const calculateBtn = document.getElementById('calculate-total');
+        const itemsContainer = document.getElementById('items-container');
+        const totalSpan = document.querySelector('.total');
+
+        addItemBtn.addEventListener('click', () => {
+            const newItem = document.createElement('div');
+            newItem.classList.add('item');
+            newItem.innerHTML = '<input type="number" placeholder="Enter amount" class="amount">';
+            itemsContainer.appendChild(newItem);
+        });
+
+        calculateBtn.addEventListener('click', () => {
+            let total = 0;
+            const amounts = document.querySelectorAll('.amount');
+            amounts.forEach(amount => {
+                const value = parseFloat(amount.value);
+                if (!isNaN(value)) {
+                    total += value;
+                }
+            });
+            totalSpan.textContent = total.toFixed(2);
+        });
+    </script>
+</body>
+</html>
