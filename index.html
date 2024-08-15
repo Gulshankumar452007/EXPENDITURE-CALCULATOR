@@ -3,56 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expenditure Calculator</title>
+    <title>Advanced Expenditure Calculator</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
-        h1 { text-align: center; color: #333; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
-        input[type="number"] { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; }
-        button { width: 100%; padding: 10px; background-color: #007BFF; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; }
-        button:hover { background-color: #0056b3; }
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #eef2f7; }
+        h1 { text-align: center; color: #444; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 12px rgba(0, 0, 0, 0.1); }
+        input[type="text"], input[type="number"] { width: calc(45% - 12px); padding: 10px; margin: 10px 6px; border-radius: 5px; border: 1px solid #ddd; }
+        .item-total { width: calc(10% - 12px); text-align: right; margin: 10px 6px; line-height: 36px; }
+        button { width: calc(45% - 12px); padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin: 10px 6px; }
+        button:hover { background-color: #218838; }
+        .item-container { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; animation: fadeIn 0.5s ease; }
+        .delete-btn { background-color: #dc3545; padding: 8px; cursor: pointer; border-radius: 5px; color: white; }
+        .delete-btn:hover { background-color: #c82333; }
         .result { margin-top: 20px; font-size: 18px; color: #333; }
         .total { font-weight: bold; }
+        .reset-btn { background-color: #ffc107; padding: 10px; cursor: pointer; border-radius: 5px; color: white; margin: 10px 6px; }
+        .reset-btn:hover { background-color: #e0a800; }
+        @media (max-width: 600px) {
+            input[type="text"], input[type="number"], button { width: 100%; margin: 10px 0; }
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Expenditure Calculator</h1>
+        <h1>Advanced Expenditure Calculator</h1>
         <div id="items-container">
-            <div class="item">
-                <input type="number" placeholder="Enter amount" class="amount">
+            <div class="item-container">
+                <input type="text" placeholder="Description" class="description">
+                <input type="number" placeholder="Amount" class="amount">
+                <span class="item-total">₹0</span>
+                <span class="delete-btn">Delete</span>
             </div>
         </div>
         <button id="add-item">Add Item</button>
         <button id="calculate-total">Calculate Total</button>
+        <button id="reset">Reset</button>
         <div class="result">
-            <p>Total Expenditure: <span class="total">0</span></p>
+            <p>Total Items: <span class="item-count">1</span></p>
+            <p>Total Expenditure: ₹<span class="total">0</span></p>
+            <p>Highest Expenditure: ₹<span class="highest">0</span></p>
+            <p>Lowest Expenditure: ₹<span class="lowest">0</span></p>
         </div>
     </div>
     <script>
         const addItemBtn = document.getElementById('add-item');
         const calculateBtn = document.getElementById('calculate-total');
+        const resetBtn = document.getElementById('reset');
         const itemsContainer = document.getElementById('items-container');
+        const itemCountSpan = document.querySelector('.item-count');
         const totalSpan = document.querySelector('.total');
+        const highestSpan = document.querySelector('.highest');
+        const lowestSpan = document.querySelector('.lowest');
 
         addItemBtn.addEventListener('click', () => {
             const newItem = document.createElement('div');
-            newItem.classList.add('item');
-            newItem.innerHTML = '<input type="number" placeholder="Enter amount" class="amount">';
+            newItem.classList.add('item-container');
+            newItem.innerHTML = `
+                <input type="text" placeholder="Description" class="description">
+                <input type="number" placeholder="Amount" class="amount">
+                <span class="item-total">₹0</span>
+                <span class="delete-btn">Delete</span>`;
             itemsContainer.appendChild(newItem);
+            updateItemCount();
+            addDeleteFunctionality(newItem);
+            addAmountChangeListener(newItem);
         });
 
         calculateBtn.addEventListener('click', () => {
-            let total = 0;
+            let total = 0, highest = 0, lowest = Number.MAX_VALUE;
             const amounts = document.querySelectorAll('.amount');
             amounts.forEach(amount => {
                 const value = parseFloat(amount.value);
                 if (!isNaN(value)) {
                     total += value;
+                    if (value > highest) highest = value;
+                    if (value < lowest) lowest = value;
                 }
             });
             totalSpan.textContent = total.toFixed(2);
+            highestSpan.textContent = highest.toFixed(2);
+            lowestSpan.textContent = lowest === Number.MAX_VALUE ? '0' : lowest.toFixed(2);
         });
+
+        resetBtn.addEventListener('click', () => {
+            itemsContainer.innerHTML = '';
+            const initialItem = document.createElement('div');
+            initialItem.classList.add('item-container');
+            initialItem.innerHTML = `
+                <input type="text" placeholder="Description" class="description">
+                <input type="number" placeholder="Amount" class="amount">
+                <span class="item-total">₹0</span>
+                <span class="delete-btn">Delete</span>`;
+            itemsContainer.appendChild(initialItem);
+            updateItemCount();
+            addDeleteFunctionality(initialItem);
+            addAmountChangeListener(initialItem);
+            totalSpan.textContent = '0';
+            highestSpan.textContent = '0';
+            lowestSpan.textContent = '0';
+        });
+
+        function updateItemCount() {
+            const items = document.querySelectorAll('.item-container').length;
+            itemCountSpan.textContent = items;
+        }
+
+        function addDeleteFunctionality(item) {
+            item.querySelector('.delete-btn').addEventListener('click', () => {
+                item.remove();
+                updateItemCount();
+            });
+        }
+
+        function addAmountChangeListener(item) {
+            const amountInput = item.querySelector('.amount');
+            const itemTotal = item.querySelector('.item-total');
+            amountInput.addEventListener('input', () => {
+                const value = parseFloat(amountInput.value);
+                itemTotal.textContent = `₹${isNaN(value) ? '0' : value.toFixed(2)}`;
+            });
+        }
+
+        // Add delete functionality and amount change listener to the initial item
+        const initialItem = document.querySelector('.item-container');
+        addDeleteFunctionality(initialItem);
+        addAmountChangeListener(initialItem);
     </script>
 </body>
 </html>
