@@ -6,6 +6,14 @@ The Comprehensive Expenditure Calculator is a web application designed to help u
 
 **Live Website**: [https://gulshankumar452007.github.io/EXPENDITURE-CALCULATOR/](https://gulshankumar452007.github.io/EXPENDITURE-CALCULATOR/)
 
+## HOW TO LOGIN
+
+The login feature in the provided code is a mock authentication system for demonstration purposes. It does not connect to any real authentication service or database. Here’s how you can use the login functionality in the current setup:
+
+**Mock Login Details**:
+**Username**: user
+**Password**: password
+
 ## Features
 
 - **Expense Management**: Add, edit, and delete expenses.
